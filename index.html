@@ -62,6 +62,7 @@ h1{font-size:34px;line-height:1.05;margin:0 0 6px;font-weight:700;text-wrap:bala
 .pri,.ghost,.danger,.btn{min-height:48px;border-radius:12px;padding:10px 16px;font-weight:500;border:1px solid var(--line);background:var(--card);text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 .pri{background:var(--acc);border-color:var(--acc);color:#fff;flex:1}
 .danger{color:#c62f1a}
+.btn{color:var(--ink)}
 dialog{border:0;padding:0;background:transparent;width:100%;max-width:640px;margin:auto auto 0;max-height:92vh}
 dialog::backdrop{background:rgb(0 0 0/.45)}
 .sheet{background:var(--bg);color:var(--ink);border-radius:20px 20px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
@@ -134,6 +135,27 @@ select{font:inherit;font-size:16px;color:inherit;min-height:48px;border:1px soli
 .chosen{margin-top:14px}
 .cin{min-height:48px}
 .upd{font-size:13px;color:var(--mut);margin:6px 0 0}
+.seg{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin-top:10px}
+.seg button{flex:1;min-height:40px;border:0;border-radius:9px;background:none;font-weight:500}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.calh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:18px}
+.calh h2{font-size:21px;margin:0;text-align:center}
+.calh button{min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:20px}
+.wd,.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.wd{margin-top:12px;font-size:12px;color:var(--mut);text-align:center}
+.cal{margin-top:6px}
+.day{aspect-ratio:1;min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:15px;padding:0}
+.day.today{border:2px solid var(--acc);font-weight:700}
+.day.sel{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.day .dt{display:flex;gap:3px;height:6px}
+.day .dt i{width:6px;height:6px;border-radius:50%}
+.dt .d,.legend .d{background:var(--acc)}.dt .a,.legend .a{background:#8a9396}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--mut);margin-top:10px}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-inline-end:5px}
+.due{font-weight:500;color:#b7791f}.due.late{color:#c62f1a}
+.callinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.callinks a{min-height:40px;font-size:14px;padding:6px 12px}
+.calsec h2{font-size:17px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media(min-width:700px){h1{font-size:44px}}
 </style>
@@ -151,6 +173,7 @@ select{font:inherit;font-size:16px;color:inherit;min-height:48px;border:1px soli
       <input id="q" class="search" type="search" data-ph="search" data-al="searchAria">
       <select id="tf" data-al="typeL"></select>
     </div>
+    <div class="seg" id="seg"><button type="button" data-v="list" data-i="viewList"></button><button type="button" data-v="cal" data-i="viewCal"></button></div>
   </header>
   <nav id="tabs" class="tabs" data-al="cats"></nav>
   <p id="info" class="note-s"></p>
@@ -191,6 +214,9 @@ select{font:inherit;font-size:16px;color:inherit;min-height:48px;border:1px soli
     <textarea id="wznote" data-ph="notePh"></textarea>
     <div class="quick" id="wzquick"></div>
     <p class="will" id="wzwill"></p>
+    <label for="wzdue" data-i="dueL"></label>
+    <input id="wzdue" class="cin" type="date">
+    <p class="upd" data-i="dueHelp"></p>
   </section>
   <div class="row">
     <button class="ghost" id="wzback" type="button" data-i="back"></button>
@@ -210,6 +236,9 @@ select{font:inherit;font-size:16px;color:inherit;min-height:48px;border:1px soli
   <p class="upd" id="edupd"></p>
   <div class="quick" id="quick"></div>
   <p class="will" id="will"></p>
+  <label for="eddue" data-i="dueL"></label>
+  <input id="eddue" class="cin" type="date">
+  <div class="callinks" id="callinks"><a class="btn" id="gcal" target="_blank" rel="noopener" data-i="gcal"></a><a class="btn" id="icsl" data-i="ics"></a></div>
   <div class="row">
     <button class="pri" id="save" type="button" data-i="save"></button>
     <a class="btn" id="open" target="_blank" rel="noopener" data-i="open"></a>
@@ -297,6 +326,10 @@ ar:{title:'مصنّف الملفات',other:'Français',
  fname:'اسم الملف',saving:'جارٍ الحفظ…',savedOk:'حُفظ الملف وصُنّف',typeL:'نوع الملف',allTypes:'كل الأنواع',noType:'بلا نوع',
  typesL:'أنواع الملفات',typesHelp:'افصل بين الأنواع بفاصلة. تظهر في الخطوة الأولى عند إضافة ملف.',launchWz:'افتح نافذة الإضافة مباشرة بعد فتح التطبيق',
  updated:d=>'آخر تعديل للملاحظة: '+d,pdfFail:'تعذّر إنشاء PDF دون اتصال؛ حُفظت الصفحات صورًا منفصلة',procFail:'تعذّرت معالجة الصورة — حاول مرة أخرى',
+ viewList:'القائمة',viewCal:'التقويم',dueL:'موعد مرتبط بالملف (اختياري)',dueHelp:'مثل تاريخ دفع فاتورة أو انتهاء صلاحية وثيقة.',
+ gcal:'إضافة إلى تقويم Google',ics:'ملف تقويم (.ics)',dueBadge:d=>'موعد: '+d,late:' — فات',upcoming:'المواعيد القادمة',overdueH:'مواعيد فائتة',
+ noUpcoming:'لا مواعيد قادمة. أضف موعدًا لأي ملف من نافذة تعديله.',dueDay:'مواعيد هذا اليوم',addedDay:'أُضيفت في هذا اليوم',nothingDay:'لا شيء في هذا اليوم.',
+ prevM:'الشهر السابق',nextM:'الشهر التالي',wd:['إثن','ثلا','أرب','خمي','جمع','سبت','أحد'],legDue:'موعد',legAdd:'إضافة ملف',
  kb:'ك.ب',mb:'م.ب',locale:'ar-u-nu-latn'},
 fr:{title:'Classeur de fichiers',other:'العربية',
  sub:'Écrivez une note sur chaque fichier : l’application le range automatiquement, par hashtags comme <b class="ht">#factures</b> ou par mots-clés.',
@@ -330,6 +363,10 @@ fr:{title:'Classeur de fichiers',other:'العربية',
  fname:'Nom du fichier',saving:'Enregistrement…',savedOk:'Fichier enregistré et classé',typeL:'Type de fichier',allTypes:'Tous les types',noType:'Sans type',
  typesL:'Types de fichiers',typesHelp:'Séparez les types par des virgules. Ils s’affichent à la première étape de l’ajout.',launchWz:'Ouvrir l’ajout dès l’ouverture de l’application',
  updated:d=>'Note modifiée le '+d,pdfFail:'PDF impossible hors connexion ; pages enregistrées en images séparées',procFail:'Traitement de l’image impossible — réessayez',
+ viewList:'Liste',viewCal:'Calendrier',dueL:'Échéance liée au fichier (facultatif)',dueHelp:'Ex. : date de paiement d’une facture ou d’expiration d’un document.',
+ gcal:'Ajouter à Google Agenda',ics:'Fichier agenda (.ics)',dueBadge:d=>'Échéance : '+d,late:' — dépassée',upcoming:'Échéances à venir',overdueH:'Échéances dépassées',
+ noUpcoming:'Aucune échéance à venir. Ajoutez-en une depuis la fiche d’un fichier.',dueDay:'Échéances du jour',addedDay:'Ajoutés ce jour',nothingDay:'Rien ce jour-là.',
+ prevM:'Mois précédent',nextM:'Mois suivant',wd:['L','M','M','J','V','S','D'],legDue:'échéance',legAdd:'fichier ajouté',
  kb:'Ko',mb:'Mo',locale:'fr'}
 };
 let lang='ar';
@@ -356,7 +393,10 @@ const SAMPLE_KINDS={ar:['عقد','وثيقة شخصية','تقرير','فاتو�
 let types=null;try{types=JSON.parse(localStorage.getItem('musannif-types'))}catch(e){}
 const getTypes=()=>types&&types.length?types:DEF_TYPES[lang];
 const wantLaunch=()=>{try{return localStorage.getItem('musannif-launch')!=='0'}catch(e){return true}};
-let kindF='all',launchWz=true;
+let kindF='all',launchWz=true,selDay=null,calMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+let view='list';try{view=localStorage.getItem('musannif-view')==='cal'?'cal':'list'}catch(e){}
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const pd=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
 const COLORS=['#e4572e','#2f7bbf','#c99700','#7a5ba6','#2a9d8f','#c0577a','#4f6d7a','#d17a22'];
 const NONE='__none',OTHER='__other';
 const gl=g=>g===NONE?t('none'):g===OTHER?t('otherG'):g;
@@ -398,7 +438,7 @@ function url(f){if(!f.blob)return null;if(!urls.has(f.id))try{urls.set(f.id,URL.
 const size=b=>b>=1e6?(b/1048576).toFixed(1)+' '+t('mb'):Math.max(1,Math.round(b/1024))+' '+t('kb');
 const date=d=>{try{return new Date(d).toLocaleDateString(t('locale'),{day:'numeric',month:'short',year:'numeric'})}catch(e){return ''}};
 const hl=s=>esc(s).replace(/#[\p{L}\p{N}_]+/gu,m=>`<span class="ht">${m}</span>`);
-const samples=()=>{const now=Date.now();return SAMPLES[lang].map((s,i)=>({id:'s'+i,name:s[0],type:s[1],size:s[2],note:s[3],kind:SAMPLE_KINDS[lang][i],added:now-i*86400000*2,sample:true}))};
+const samples=()=>{const now=Date.now();return SAMPLES[lang].map((s,i)=>({id:'s'+i,name:s[0],type:s[1],size:s[2],note:s[3],kind:SAMPLE_KINDS[lang][i],due:[ymd(new Date(now+86400000*9)),'',ymd(new Date(now+86400000*3)),ymd(new Date(now-86400000*2)),'','',''][i],added:now-i*86400000*2,sample:true}))};
 
 function icon(f){
   const u=/image/.test(f.type)&&url(f);
@@ -407,7 +447,7 @@ function icon(f){
 function card(f){
   return `<button class="card" data-id="${f.id}" type="button">${icon(f)}<div>
     <div class="nm">${esc(f.name)}</div>
-    <p class="meta">${f.kind?`<span class="kind">${esc(f.kind)}</span> · `:''}${size(f.size)} · ${date(f.added)}</p>
+    <p class="meta">${f.kind?`<span class="kind">${esc(f.kind)}</span> · `:''}${size(f.size)} · ${date(f.added)}</p>${f.due?`<p class="meta due${f.due<ymd(new Date())?' late':''}">${t('dueBadge',date(pd(f.due)))}${f.due<ymd(new Date())?t('late'):''}</p>`:''}
     <p class="nt ${f.note.trim()?'':'empty'}">${f.note.trim()?hl(f.note):t('noNote')}</p>
     <div class="pills">${groupsOf(f.note).map(pill).join('')}</div>
   </div></button>`;
@@ -426,6 +466,9 @@ function render(){
   $('#tabs').innerHTML=`<button class="tab" type="button" data-g="all" style="--c:var(--ink)" aria-pressed="${filter==='all'}">${t('all')}<span>${vis.length}</span></button>`+
     order.map(g=>`<button class="tab" type="button" data-g="${esc(g)}" style="--c:${color(g)}" aria-pressed="${filter===g}">${esc(gl(g))}<span>${G.get(g).length}</span></button>`).join('');
   $('#info').textContent=files.some(f=>f.sample)?t('sampleInfo'):!db?t('noStore'):'';
+  document.querySelectorAll('#seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===view));
+  $('#tabs').hidden=view==='cal';
+  if(view==='cal'){$('#list').innerHTML=calHTML(vis);return}
   if(!files.length){$('#list').innerHTML=`<div class="empty-st">${t('empty')}</div>`;return}
   if(!vis.length){$('#list').innerHTML=`<div class="empty-st">${t('noRes')}</div>`;return}
   const shown=filter==='all'?order:[filter];
@@ -448,11 +491,12 @@ function openEd(id){
   const ks=[...new Set([...getTypes(),cur.kind].filter(Boolean))];
   $('#edk').innerHTML=`<option value="">${t('noType')}</option>`+ks.map(k=>`<option${k===cur.kind?' selected':''}>${esc(k)}</option>`).join('');
   $('#edupd').textContent=cur.noteAt?t('updated',date(cur.noteAt)):'';
+  $('#eddue').value=cur.due||'';calLinks(cur,cur.due||'');
   $('#quick').innerHTML=cats.map(c=>`<button type="button" data-t="${esc(c.name)}">+ ${esc(c.name)}</button>`).join('');
   const o=$('#open');if(u){o.href=u;o.hidden=false}else{o.removeAttribute('href');o.hidden=true}
   preview();$('#ed').showModal();
 }
-async function saveEd(){if(!cur)return;const n=$('#note').value;if(n!==cur.note){cur.note=n;cur.noteAt=Date.now()}cur.kind=$('#edk').value;await put(cur);$('#ed').close();render()}
+async function saveEd(){if(!cur)return;const n=$('#note').value;if(n!==cur.note){cur.note=n;cur.noteAt=Date.now()}cur.kind=$('#edk').value;cur.due=$('#eddue').value||'';await put(cur);$('#ed').close();render()}
 async function delEd(){
   if(!cur)return;const f=cur,i=files.indexOf(f);
   files.splice(i,1);await del(f.id);$('#ed').close();render();
@@ -583,7 +627,7 @@ function go(n){
   if(n===3){
     const today=new Date().toISOString().slice(0,10);
     $('#wzname').value=wz.file?wz.file.name.replace(/\.[^.]+$/,''):(wz.type+' '+today);
-    $('#wznote').value='';
+    $('#wznote').value='';$('#wzdue').value='';
     $('#wzquick').innerHTML=cats.map(c=>`<button type="button" data-t="${esc(c.name)}">+ ${esc(c.name)}</button>`).join('');
     wzPreview();
   }
@@ -658,10 +702,10 @@ async function wzSave(){
         catch(e){outs=pr.map(p=>({blob:p.blob,mime:'image/jpeg',ext:'.jpg'}));pdfErr=true}
     }
   }catch(e){toast(t('procFail'));btn.disabled=false;btn.textContent=t('save');return}
-  const base=$('#wzname').value.trim()||wz.type||'file',note=$('#wznote').value,now=Date.now();
+  const base=$('#wzname').value.trim()||wz.type||'file',note=$('#wznote').value,due=$('#wzdue').value||'',now=Date.now();
   files=files.filter(f=>!f.sample);
   for(let i=outs.length-1;i>=0;i--){const o=outs[i];
-    const f={id:uid(),name:base+(outs.length>1?' ('+(i+1)+')':'')+o.ext,type:o.mime,size:o.blob.size,added:now+i,note,noteAt:note.trim()?now:0,kind:wz.type,blob:o.blob};
+    const f={id:uid(),name:base+(outs.length>1?' ('+(i+1)+')':'')+o.ext,type:o.mime,size:o.blob.size,added:now+i,note,noteAt:note.trim()?now:0,kind:wz.type,due,blob:o.blob};
     files.unshift(f);await put(f)}
   $('#wz').close();wzReset();filter='all';kindF='all';render();toast(pdfErr?t('pdfFail'):t('savedOk'));
 }
@@ -684,6 +728,54 @@ $('#wzbrowse').addEventListener('click',()=>{$('#wz').close();wzReset()});
 $('#wzx').addEventListener('click',()=>{$('#wz').close();wzReset()});
 $('#wznote').addEventListener('input',wzPreview);
 $('#wzquick').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const h='#'+b.dataset.t.replace(/\s+/g,'_');const n=$('#wznote');if(!n.value.includes(h))n.value=(n.value.trim()+' '+h).trim();wzPreview()});
+
+/* ——— التقويم / Calendrier ——— */
+function calHTML(vis){
+  const y=calMonth.getFullYear(),mo=calMonth.getMonth(),today=ymd(new Date());
+  const off=(new Date(y,mo,1).getDay()+6)%7,days=new Date(y,mo+1,0).getDate();
+  const due=new Map(),add=new Map(),push=(m,k,f)=>{if(!m.has(k))m.set(k,[]);m.get(k).push(f)};
+  for(const f of vis){if(f.due)push(due,f.due,f);push(add,ymd(new Date(f.added)),f)}
+  const rtl=lang==='ar';
+  let h=`<div class="calh"><button type="button" id="cprev" aria-label="${t('prevM')}">${rtl?'›':'‹'}</button><h2>${esc(calMonth.toLocaleDateString(t('locale'),{month:'long',year:'numeric'}))}</h2><button type="button" id="cnext" aria-label="${t('nextM')}">${rtl?'‹':'›'}</button></div>`;
+  h+=`<div class="wd">${t('wd').map(w=>`<span>${w}</span>`).join('')}</div><div class="cal">`;
+  for(let i=0;i<off;i++)h+='<span></span>';
+  for(let d=1;d<=days;d++){
+    const k=ymd(new Date(y,mo,d));
+    h+=`<button type="button" class="day${k===today?' today':''}${k===selDay?' sel':''}" data-d="${k}"><span>${d}</span><span class="dt">${due.has(k)?'<i class="d"></i>':''}${add.has(k)?'<i class="a"></i>':''}</span></button>`;
+  }
+  h+=`</div><div class="legend"><span><i class="d"></i>${t('legDue')}</span><span><i class="a"></i>${t('legAdd')}</span></div>`;
+  const sec=(title,list)=>list.length?`<section class="grp calsec"><h2 style="--c:var(--acc)"><i></i>${title}<span>${list.length}</span></h2><div class="cards">${list.map(card).join('')}</div></section>`:'';
+  if(selDay){
+    const a=due.get(selDay)||[],b=add.get(selDay)||[];
+    h+=`<h2 style="font-size:19px;margin:22px 0 0">${esc(pd(selDay).toLocaleDateString(t('locale'),{weekday:'long',day:'numeric',month:'long'}))}</h2>`;
+    h+=(a.length||b.length)?sec(t('dueDay'),a)+sec(t('addedDay'),b):`<p class="empty-st" style="padding:20px">${t('nothingDay')}</p>`;
+  }else{
+    const withDue=vis.filter(f=>f.due).sort((a,b)=>a.due<b.due?-1:1);
+    const late=withDue.filter(f=>f.due<today),next=withDue.filter(f=>f.due>=today);
+    h+=sec(t('overdueH'),late)+(next.length?sec(t('upcoming'),next):`<p class="empty-st" style="padding:20px">${t('noUpcoming')}</p>`);
+  }
+  return h;
+}
+const icsEsc=s=>String(s||'').replace(/\\/g,'\\\\').replace(/([,;])/g,'\\$1').replace(/\r?\n/g,'\\n');
+function calLinks(f,dueStr){
+  const box=$('#callinks');box.hidden=!dueStr;if(!dueStr)return;
+  const d=dueStr.replace(/-/g,''),n=ymd(new Date(pd(dueStr).getTime()+86400000*1.5)).replace(/-/g,'');
+  const title=(f.kind?f.kind+' — ':'')+f.name.replace(/\.[^.]+$/,''),note=$('#note').value;
+  $('#gcal').href='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(title)+'&dates='+d+'/'+n+'&details='+encodeURIComponent(note);
+  const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//musannif//file-calendar//AR','BEGIN:VEVENT','UID:'+f.id+'@musannif','DTSTAMP:'+stamp,
+    'DTSTART;VALUE=DATE:'+d,'DTEND;VALUE=DATE:'+n,'SUMMARY:'+icsEsc(title),'DESCRIPTION:'+icsEsc(note),
+    'BEGIN:VALARM','TRIGGER:-PT15H','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(title),'END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a=$('#icsl');try{if(a.dataset.u)URL.revokeObjectURL(a.dataset.u);a.dataset.u=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));a.href=a.dataset.u}catch(e){}
+  a.download=title.replace(/[\\/:*?"<>|]/g,'_')+'.ics';
+}
+$('#seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.v;try{localStorage.setItem('musannif-view',view)}catch(x){}selDay=null;render()});
+$('#list').addEventListener('click',e=>{
+  if(e.target.closest('#cprev')){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1);selDay=null;render();return}
+  if(e.target.closest('#cnext')){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);selDay=null;render();return}
+  const d=e.target.closest('.day');if(d){selDay=selDay===d.dataset.d?null:d.dataset.d;render()}
+});
+$('#eddue').addEventListener('input',()=>cur&&calLinks(cur,$('#eddue').value));
 
 /* ——— تطبيق اللغة / Appliquer la langue ——— */
 function applyLang(){
