@@ -105,6 +105,35 @@ header{position:relative}
 .pad button:disabled{opacity:.35}
 .lklink{margin-top:26px;background:none;border:0;color:#f3a58c;font-size:15px;min-height:44px;padding:8px 12px}
 .sec{margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}
+.srow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:16px}
+.srow .search{margin-top:0}
+select{font:inherit;font-size:16px;color:inherit;min-height:48px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:8px 12px;max-width:44vw}
+.kind{font-weight:500;color:var(--ink)}
+.wzh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.wzh .stp{font-size:14px;color:var(--mut);font-weight:500}
+.wzh .x{min-width:44px;min-height:44px;border:0;background:none;font-size:26px;line-height:1;color:var(--mut)}
+.bars{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px}
+.bars i{height:5px;border-radius:9px;background:var(--line)}
+.bars i.on{background:var(--acc)}
+.types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:16px}
+.tile{min-height:64px;border:1px solid var(--line);border-radius:14px;background:var(--card);font-weight:500;padding:10px;text-align:center;box-shadow:inset 0 -4px 0 var(--c)}
+.tile:active{transform:scale(.97)}
+.bigs{display:grid;gap:10px;margin-top:16px}
+.bigbtn{display:flex;align-items:center;gap:14px;min-height:72px;border:1px solid var(--line);border-radius:16px;background:var(--card);padding:12px 16px;font-weight:500;font-size:17px;text-align:start}
+.bigbtn svg{flex:none;width:32px;height:32px;color:var(--acc)}
+.bigbtn.main{background:var(--acc);border-color:var(--acc);color:#fff}
+.bigbtn.main svg{color:#fff}
+.pages{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin-top:14px}
+.pg{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--card);border:1px solid var(--line)}
+.pg img{width:100%;height:100%;object-fit:cover}
+.pg b{position:absolute;inset-inline-start:6px;bottom:6px;background:rgb(0 0 0/.6);color:#fff;font-size:12px;border-radius:6px;padding:0 6px}
+.pg button{position:absolute;top:4px;inset-inline-end:4px;width:32px;height:32px;border-radius:50%;border:0;background:rgb(0 0 0/.6);color:#fff;font-size:18px}
+.pgadd{aspect-ratio:3/4;border:2px dashed var(--line);border-radius:10px;background:none;font-weight:500;color:var(--mut)}
+.chk{display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:400;min-height:44px}
+.chk input{width:22px;height:22px;accent-color:var(--acc)}
+.chosen{margin-top:14px}
+.cin{min-height:48px}
+.upd{font-size:13px;color:var(--mut);margin:6px 0 0}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media(min-width:700px){h1{font-size:44px}}
 </style>
@@ -118,7 +147,10 @@ header{position:relative}
     </div>
     <h1 data-i="title">مصنّف الملفات</h1>
     <p class="sub" data-ih="sub"></p>
-    <input id="q" class="search" type="search" data-ph="search" data-al="searchAria">
+    <div class="srow">
+      <input id="q" class="search" type="search" data-ph="search" data-al="searchAria">
+      <select id="tf" data-al="typeL"></select>
+    </div>
   </header>
   <nav id="tabs" class="tabs" data-al="cats"></nav>
   <p id="info" class="note-s"></p>
@@ -135,15 +167,47 @@ header{position:relative}
   <button class="pri" id="addb" type="button" data-i="add"></button>
   <button class="ghost" id="catb" type="button" data-i="cats"></button>
   <button class="ghost" id="instb" type="button" data-i="install" hidden></button>
-  <input id="pick" type="file" multiple hidden>
+  <input id="cam" type="file" accept="image/*" capture="environment" hidden>
+  <input id="pickw" type="file" multiple hidden>
 </div></div>
+
+<dialog id="wz"><div class="sheet">
+  <div class="wzh"><span class="stp" id="wzstp"></span><button class="x" id="wzx" type="button" data-al="close">×</button></div>
+  <div class="bars"><i></i><i></i><i></i></div>
+  <h3 id="wzt"></h3>
+  <p class="will" id="wzs"></p>
+  <section id="wz1"><div class="types" id="wztypes"></div></section>
+  <section id="wz2" hidden>
+    <div class="bigs" id="wzbig">
+      <button class="bigbtn main" id="wzcam" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h2l1.5-2h6l1.5 2h2A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="12.5" r="3.8"/></svg><span data-i="camera"></span></button>
+      <button class="bigbtn" id="wzpick" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/></svg><span data-i="pickFile"></span></button>
+    </div>
+    <div id="wzpages"></div>
+  </section>
+  <section id="wz3" hidden>
+    <label for="wzname" data-i="fname"></label>
+    <input id="wzname" class="cin" type="text">
+    <label for="wznote" data-i="notes"></label>
+    <textarea id="wznote" data-ph="notePh"></textarea>
+    <div class="quick" id="wzquick"></div>
+    <p class="will" id="wzwill"></p>
+  </section>
+  <div class="row">
+    <button class="ghost" id="wzback" type="button" data-i="back"></button>
+    <button class="pri" id="wznext" type="button"></button>
+    <button class="ghost" id="wzbrowse" type="button" data-i="browse"></button>
+  </div>
+</div></dialog>
 
 <dialog id="ed"><div class="sheet">
   <div class="prev" id="prev"></div>
   <h3 id="edn"></h3>
   <p class="meta" id="edm"></p>
+  <label for="edk" data-i="typeL"></label>
+  <select id="edk" style="max-width:100%;width:100%"></select>
   <label for="note" data-i="notes"></label>
   <textarea id="note" data-ph="notePh"></textarea>
+  <p class="upd" id="edupd"></p>
   <div class="quick" id="quick"></div>
   <p class="will" id="will"></p>
   <div class="row">
@@ -159,6 +223,10 @@ header{position:relative}
   <p class="will" data-i="catsHelp"></p>
   <div id="catl"></div>
   <div class="row"><button class="ghost" id="addc" type="button" data-i="newCat"></button></div>
+  <label for="typesIn" data-i="typesL"></label>
+  <input id="typesIn" class="cin" type="text">
+  <p class="will" data-i="typesHelp"></p>
+  <label class="chk"><input id="launchChk" type="checkbox"><span data-i="launchWz"></span></label>
   <div class="row">
     <button class="pri" id="savec" type="button" data-i="save"></button>
     <button class="ghost" id="copyi" type="button" data-i="copyIdx"></button>
@@ -204,7 +272,7 @@ ar:{title:'مصنّف الملفات',other:'Français',
  inst1:'على أندرويد: افتح الرابط في Chrome ← اضغط زر «تثبيت» في أسفل الشاشة، أو القائمة ⋮ ← «تثبيت التطبيق». بعد التثبيت يظهر «مصنّف» في قائمة المشاركة لأي تطبيق، فترسل إليه الملفات مباشرة.',
  inst2:'على الآيفون: افتح الرابط في Safari ← زر المشاركة ← «إضافة إلى الشاشة الرئيسية».',
  inst3:'تُحفظ الملفات وملاحظاتها داخل الهاتف نفسه ولا تُرفع إلى أي خادم.',
- add:'+ إضافة ملفات',cats:'التصنيفات',install:'تثبيت',notes:'الملاحظات',notePh:'مثال: فاتورة الكهرباء، للمراجعة غدًا #منزل',
+ add:'+ إضافة ملف',cats:'التصنيفات',install:'تثبيت',notes:'الملاحظات',notePh:'مثال: فاتورة الكهرباء، للمراجعة غدًا #منزل',
  save:'حفظ',open:'فتح الملف',del:'حذف',close:'إغلاق',
  catsTitle:'التصنيفات والكلمات المفتاحية',
  catsHelp:'يدخل الملف في التصنيف إذا تضمّنت ملاحظته اسمَ التصنيف أو إحدى كلماته (افصل بينها بفاصلة). أي وسم يبدأ بـ # ينشئ تصنيفًا تلقائيًا.',
@@ -217,11 +285,18 @@ ar:{title:'مصنّف الملفات',other:'Français',
  pinRemoved:'أُزيل رمز القفل',pinChanged:'تغيّر الرمز',pinSet:'فُعّل القفل برمز سري',wiped:'مُسح كل شيء — أنشئ رمزًا جديدًا',delKey:'مسح رقم',
  none:'بلا ملاحظات',otherG:'أخرى',all:'الكل',
  sampleInfo:'أمثلة توضيحية — تختفي عند إضافة أول ملف لك.',noStore:'التخزين غير متاح في هذه النافذة؛ ستبقى الملفات حتى إغلاق الصفحة فقط.',
- empty:'لا ملفات بعد. اضغط «إضافة ملفات» لاختيار صور أو مستندات من هاتفك.',noRes:'لا نتائج لهذا البحث.',
+ empty:'لا ملفات بعد. اضغط «إضافة ملف» لتصوير مستند أو اختياره من هاتفك.',noRes:'لا نتائج لهذا البحث.',
  noNote:'لا ملاحظة بعد — اضغط لإضافتها',will:'سيُصنَّف في: ',sample:' · مثال',
  deleted:n=>'حُذف «'+n+'»',undo:'تراجع',catsSaved:'حُفظت التصنيفات وأُعيد تصنيف الملفات',copied:'نُسخ فهرس الملفات',copyFail:'تعذّر النسخ في هذه النافذة',
  addedMany:n=>'أُضيف '+n+' ملفات في «بلا ملاحظات» — اضغط على أي ملف لكتابة ملاحظته',
  shared:n=>'استُلم '+n+' ملفات من المشاركة — اكتب ملاحظاتها لتصنيفها',sharedNone:'لم يصل أي ملف من المشاركة',installed:'ثُبّت التطبيق على هاتفك',
+ wzStep:n=>'الخطوة '+n+' من 3',wz1:'ما نوع الملف؟',wz1s:'اختر النوع، ثم تنتقل إلى التصوير.',browse:'تصفّح ملفاتي',
+ wz2:'صوّر الملف أو اختره',wz2s:'صوّر صفحة أو أكثر؛ تُجمع الصفحات المتعددة في ملف PDF واحد.',camera:'تصوير بالكاميرا',pickFile:'اختيار ملف من الهاتف',
+ addPage:'+ صفحة',enhance:'وضع المستند: تحسين وضوح الكتابة',pagesN:n=>n===1?'صفحة واحدة':n+' صفحات',rmPage:'حذف الصفحة',change:'تغيير',
+ back:'رجوع',next:'التالي',wz3:'اكتب ملاحظة الملف',wz3s:'يُصنَّف الملف حسب هذه الملاحظة، ويمكنك تعديلها متى شئت من قائمة الملفات.',
+ fname:'اسم الملف',saving:'جارٍ الحفظ…',savedOk:'حُفظ الملف وصُنّف',typeL:'نوع الملف',allTypes:'كل الأنواع',noType:'بلا نوع',
+ typesL:'أنواع الملفات',typesHelp:'افصل بين الأنواع بفاصلة. تظهر في الخطوة الأولى عند إضافة ملف.',launchWz:'افتح نافذة الإضافة مباشرة بعد فتح التطبيق',
+ updated:d=>'آخر تعديل للملاحظة: '+d,pdfFail:'تعذّر إنشاء PDF دون اتصال؛ حُفظت الصفحات صورًا منفصلة',procFail:'تعذّرت معالجة الصورة — حاول مرة أخرى',
  kb:'ك.ب',mb:'م.ب',locale:'ar-u-nu-latn'},
 fr:{title:'Classeur de fichiers',other:'العربية',
  sub:'Écrivez une note sur chaque fichier : l’application le range automatiquement, par hashtags comme <b class="ht">#factures</b> ou par mots-clés.',
@@ -248,6 +323,13 @@ fr:{title:'Classeur de fichiers',other:'العربية',
  deleted:n=>'« '+n+' » supprimé',undo:'Annuler',catsSaved:'Catégories enregistrées, fichiers reclassés',copied:'Index copié',copyFail:'Copie impossible dans cette fenêtre',
  addedMany:n=>n+' fichiers ajoutés dans « Sans note » — touchez un fichier pour écrire sa note',
  shared:n=>n+' fichiers reçus par partage — ajoutez leurs notes pour les classer',sharedNone:'Aucun fichier reçu par partage',installed:'Application installée',
+ wzStep:n=>'Étape '+n+' sur 3',wz1:'Quel type de fichier ?',wz1s:'Choisissez le type, puis passez à la photo.',browse:'Voir mes fichiers',
+ wz2:'Photographiez ou choisissez le fichier',wz2s:'Une ou plusieurs pages ; plusieurs pages sont réunies en un seul PDF.',camera:'Prendre en photo',pickFile:'Choisir un fichier du téléphone',
+ addPage:'+ Page',enhance:'Mode document : texte plus lisible',pagesN:n=>n+' page'+(n>1?'s':''),rmPage:'Supprimer la page',change:'Changer',
+ back:'Retour',next:'Suivant',wz3:'Écrivez la note du fichier',wz3s:'Le fichier est classé selon cette note, modifiable à tout moment depuis la liste.',
+ fname:'Nom du fichier',saving:'Enregistrement…',savedOk:'Fichier enregistré et classé',typeL:'Type de fichier',allTypes:'Tous les types',noType:'Sans type',
+ typesL:'Types de fichiers',typesHelp:'Séparez les types par des virgules. Ils s’affichent à la première étape de l’ajout.',launchWz:'Ouvrir l’ajout dès l’ouverture de l’application',
+ updated:d=>'Note modifiée le '+d,pdfFail:'PDF impossible hors connexion ; pages enregistrées en images séparées',procFail:'Traitement de l’image impossible — réessayez',
  kb:'Ko',mb:'Mo',locale:'fr'}
 };
 let lang='ar';
@@ -269,6 +351,12 @@ const SAMPLES={
  ar:[['عقد الإيجار.pdf','application/pdf',184e3,'للمراجعة قبل نهاية الشهر'],['صورة جواز السفر.jpg','image/jpeg',920e3,'نسخة للسفارة #سفر'],['تقرير الاجتماع.docx','application/msword',64e3,'اجتماع الإثنين — مهم'],['فاتورة الكهرباء.pdf','application/pdf',41e3,'فاتورة أكتوبر، الدفع عاجل'],['شهادة التخرج.pdf','application/pdf',230e3,'شهادة — النسخة الأصلية'],['ميزانية البيت.xlsx','application/vnd.ms-excel',22e3,'مصاريف الشهر #منزل'],['scan_0231.jpg','image/jpeg',1.4e6,'']],
  fr:[['Contrat de location.pdf','application/pdf',184e3,'À revoir avant la fin du mois'],['Passeport.jpg','image/jpeg',920e3,'Copie pour l’ambassade #voyage'],['Compte rendu réunion.docx','application/msword',64e3,'Réunion de lundi — important'],['Facture électricité.pdf','application/pdf',41e3,'Facture d’octobre, paiement urgent'],['Diplôme.pdf','application/pdf',230e3,'Diplôme — original'],['Budget maison.xlsx','application/vnd.ms-excel',22e3,'Dépenses du mois #maison'],['scan_0231.jpg','image/jpeg',1.4e6,'']]
 };
+const DEF_TYPES={ar:['وثيقة شخصية','فاتورة','عقد','تقرير','شهادة','رسالة','صورة','أخرى'],fr:['Pièce d’identité','Facture','Contrat','Rapport','Certificat','Courrier','Photo','Autre']};
+const SAMPLE_KINDS={ar:['عقد','وثيقة شخصية','تقرير','فاتورة','شهادة','أخرى','صورة'],fr:['Contrat','Pièce d’identité','Rapport','Facture','Certificat','Autre','Photo']};
+let types=null;try{types=JSON.parse(localStorage.getItem('musannif-types'))}catch(e){}
+const getTypes=()=>types&&types.length?types:DEF_TYPES[lang];
+const wantLaunch=()=>{try{return localStorage.getItem('musannif-launch')!=='0'}catch(e){return true}};
+let kindF='all',launchWz=true;
 const COLORS=['#e4572e','#2f7bbf','#c99700','#7a5ba6','#2a9d8f','#c0577a','#4f6d7a','#d17a22'];
 const NONE='__none',OTHER='__other';
 const gl=g=>g===NONE?t('none'):g===OTHER?t('otherG'):g;
@@ -310,7 +398,7 @@ function url(f){if(!f.blob)return null;if(!urls.has(f.id))try{urls.set(f.id,URL.
 const size=b=>b>=1e6?(b/1048576).toFixed(1)+' '+t('mb'):Math.max(1,Math.round(b/1024))+' '+t('kb');
 const date=d=>{try{return new Date(d).toLocaleDateString(t('locale'),{day:'numeric',month:'short',year:'numeric'})}catch(e){return ''}};
 const hl=s=>esc(s).replace(/#[\p{L}\p{N}_]+/gu,m=>`<span class="ht">${m}</span>`);
-const samples=()=>{const now=Date.now();return SAMPLES[lang].map((s,i)=>({id:'s'+i,name:s[0],type:s[1],size:s[2],note:s[3],added:now-i*86400000*2,sample:true}))};
+const samples=()=>{const now=Date.now();return SAMPLES[lang].map((s,i)=>({id:'s'+i,name:s[0],type:s[1],size:s[2],note:s[3],kind:SAMPLE_KINDS[lang][i],added:now-i*86400000*2,sample:true}))};
 
 function icon(f){
   const u=/image/.test(f.type)&&url(f);
@@ -319,7 +407,7 @@ function icon(f){
 function card(f){
   return `<button class="card" data-id="${f.id}" type="button">${icon(f)}<div>
     <div class="nm">${esc(f.name)}</div>
-    <p class="meta">${size(f.size)} · ${date(f.added)}</p>
+    <p class="meta">${f.kind?`<span class="kind">${esc(f.kind)}</span> · `:''}${size(f.size)} · ${date(f.added)}</p>
     <p class="nt ${f.note.trim()?'':'empty'}">${f.note.trim()?hl(f.note):t('noNote')}</p>
     <div class="pills">${groupsOf(f.note).map(pill).join('')}</div>
   </div></button>`;
@@ -327,7 +415,10 @@ function card(f){
 
 function render(){
   const nq=norm(q);
-  const vis=files.filter(f=>!nq||norm(f.name+' '+f.note).includes(nq));
+  const kinds=[...new Set([...getTypes(),...files.map(f=>f.kind).filter(Boolean)])];
+  if(kindF!=='all'&&!kinds.includes(kindF))kindF='all';
+  $('#tf').innerHTML=`<option value="all">${t('allTypes')}</option>`+kinds.map(k=>`<option value="${esc(k)}"${k===kindF?' selected':''}>${esc(k)}</option>`).join('');
+  const vis=files.filter(f=>(kindF==='all'||f.kind===kindF)&&(!nq||norm(f.name+' '+f.note+' '+(f.kind||'')).includes(nq)));
   const G=new Map();
   for(const f of vis)for(const g of groupsOf(f.note)){if(!G.has(g))G.set(g,[]);G.get(g).push(f)}
   const order=[...G.keys()].sort((a,b)=>rank(a)-rank(b)||a.localeCompare(b,lang));
@@ -354,11 +445,14 @@ function openEd(id){
   $('#edn').textContent=cur.name;
   $('#edm').textContent=size(cur.size)+' · '+date(cur.added)+(cur.sample?t('sample'):'');
   $('#note').value=cur.note;
+  const ks=[...new Set([...getTypes(),cur.kind].filter(Boolean))];
+  $('#edk').innerHTML=`<option value="">${t('noType')}</option>`+ks.map(k=>`<option${k===cur.kind?' selected':''}>${esc(k)}</option>`).join('');
+  $('#edupd').textContent=cur.noteAt?t('updated',date(cur.noteAt)):'';
   $('#quick').innerHTML=cats.map(c=>`<button type="button" data-t="${esc(c.name)}">+ ${esc(c.name)}</button>`).join('');
   const o=$('#open');if(u){o.href=u;o.hidden=false}else{o.removeAttribute('href');o.hidden=true}
   preview();$('#ed').showModal();
 }
-async function saveEd(){if(!cur)return;cur.note=$('#note').value;await put(cur);$('#ed').close();render()}
+async function saveEd(){if(!cur)return;const n=$('#note').value;if(n!==cur.note){cur.note=n;cur.noteAt=Date.now()}cur.kind=$('#edk').value;await put(cur);$('#ed').close();render()}
 async function delEd(){
   if(!cur)return;const f=cur,i=files.indexOf(f);
   files.splice(i,1);await del(f.id);$('#ed').close();render();
@@ -368,6 +462,8 @@ async function delEd(){
 function catRow(c){return `<div class="crow"><input class="cin" value="${esc(c.name)}" placeholder="${t('catName')}" aria-label="${t('catName')}"><input class="cin" value="${esc(c.kw)}" placeholder="${t('catKw')}" aria-label="${t('catKw')}"><button type="button" class="rm" aria-label="${t('rmCat')}">×</button></div>`}
 function openCats(){
   $('#catl').innerHTML=cats.map(catRow).join('');
+  $('#typesIn').value=getTypes().join(lang==='ar'?'، ':', ');
+  $('#launchChk').checked=wantLaunch();
   $('#lkstate').textContent=pinRec?t('lkOn'):t('lkOff');
   $('#pinset').textContent=pinRec?t('changePin'):t('setPin');
   $('#pinrm').hidden=$('#locknow').hidden=!pinRec;
@@ -375,6 +471,9 @@ function openCats(){
 }
 function saveCatsUI(){
   cats=[...$('#catl').querySelectorAll('.crow')].map(r=>{const [a,b]=r.querySelectorAll('input');return {name:a.value.trim(),kw:b.value.trim()}}).filter(c=>c.name);
+  const ty=$('#typesIn').value.split(/[،,;\n]/).map(x=>x.trim()).filter(Boolean);
+  if(ty.length&&ty.join('|')!==DEF_TYPES[lang].join('|')){types=ty;try{localStorage.setItem('musannif-types',JSON.stringify(ty))}catch(e){}}
+  try{localStorage.setItem('musannif-launch',$('#launchChk').checked?'1':'0')}catch(e){}
   saveCats();$('#cs').close();render();toast(t('catsSaved'));
 }
 async function copyIndex(){
@@ -412,6 +511,7 @@ function hideLock(){
   $('#lock').classList.remove('on');document.documentElement.classList.remove('locked');entry='';
   $('#lockb').hidden=!pinRec;
   const f=afterUnlock;afterUnlock=null;if(f)f();
+  if(launchWz){launchWz=false;if(wantLaunch())openWz()}
 }
 function wrong(msg){entry='';dots(true);$('#lks').textContent=msg}
 async function press(k){
@@ -459,6 +559,132 @@ $('#lkalt').addEventListener('click',async()=>{
   else hideLock();
 });
 
+/* ——— معالج الإضافة بثلاث خطوات / Assistant d'ajout ——— */
+const wz={step:1,type:'',pages:[],file:null,enh:true};
+const blobURL=b=>{try{return URL.createObjectURL(b)}catch(e){return ''}};
+function wzReset(){for(const p of wz.pages)try{URL.revokeObjectURL(p.u)}catch(e){}Object.assign(wz,{step:1,type:'',pages:[],file:null,enh:true})}
+function openWz(){
+  if(lockOn())return;
+  for(const d of document.querySelectorAll('dialog[open]'))d.close();
+  wzReset();
+  $('#wztypes').innerHTML=getTypes().map((k,i)=>`<button class="tile" type="button" data-k="${esc(k)}" style="--c:${COLORS[i%COLORS.length]}">${esc(k)}</button>`).join('');
+  go(1);$('#wz').showModal();loadPDF().catch(()=>{});
+}
+function go(n){
+  wz.step=n;
+  ['#wz1','#wz2','#wz3'].forEach((id,i)=>$(id).hidden=i!==n-1);
+  document.querySelectorAll('#wz .bars i').forEach((b,i)=>b.classList.toggle('on',i<n));
+  $('#wzstp').textContent=t('wzStep',n);
+  $('#wzt').textContent=t('wz'+n)+(n>1&&wz.type?' — '+wz.type:'');
+  $('#wzs').textContent=t('wz'+n+'s');
+  $('#wzback').hidden=n===1;$('#wzbrowse').hidden=n!==1;$('#wznext').hidden=n===1;
+  $('#wznext').disabled=false;$('#wznext').textContent=n===3?t('save'):t('next');
+  if(n===2)wzPages();
+  if(n===3){
+    const today=new Date().toISOString().slice(0,10);
+    $('#wzname').value=wz.file?wz.file.name.replace(/\.[^.]+$/,''):(wz.type+' '+today);
+    $('#wznote').value='';
+    $('#wzquick').innerHTML=cats.map(c=>`<button type="button" data-t="${esc(c.name)}">+ ${esc(c.name)}</button>`).join('');
+    wzPreview();
+  }
+}
+function wzPreview(){$('#wzwill').innerHTML=t('will')+groupsOf($('#wznote').value).map(pill).join(' ')}
+function wzPages(){
+  const has=wz.pages.length||wz.file;
+  $('#wzbig').hidden=!!has;
+  if(wz.file){
+    $('#wzpages').innerHTML=`<div class="chosen"><div class="card" style="cursor:default">${icon({name:wz.file.name,type:wz.file.type||''})}<div><div class="nm">${esc(wz.file.name)}</div><p class="meta">${size(wz.file.size)}</p></div></div><div class="row"><button class="ghost" type="button" data-act="change">${t('change')}</button></div></div>`;
+  }else if(wz.pages.length){
+    $('#wzpages').innerHTML=`<p class="will">${t('pagesN',wz.pages.length)}</p><div class="pages">${wz.pages.map((p,i)=>`<div class="pg"><img src="${p.u}" alt=""><b>${i+1}</b><button type="button" data-rm="${i}" aria-label="${t('rmPage')}">×</button></div>`).join('')}<button class="pgadd" type="button" data-act="cam">${t('addPage')}</button></div>
+      <label class="chk"><input type="checkbox" id="wzenh"${wz.enh?' checked':''}><span>${t('enhance')}</span></label>`;
+  }else $('#wzpages').innerHTML='';
+  $('#wznext').disabled=!has;
+}
+function addPicked(list){
+  for(const f of list){
+    if(/^image\//.test(f.type)){if(wz.file)wz.file=null;wz.pages.push({b:f,u:blobURL(f)})}
+    else{for(const p of wz.pages)try{URL.revokeObjectURL(p.u)}catch(e){}wz.pages=[];wz.file=f}
+  }
+  wzPages();
+}
+async function processPage(blob,enh){
+  const u=URL.createObjectURL(blob);
+  try{
+    const im=new Image();im.src=u;await im.decode();
+    const k=Math.min(1,2000/Math.max(im.naturalWidth,im.naturalHeight));
+    const w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k);
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    const x=c.getContext('2d');x.drawImage(im,0,0,w,h);
+    if(enh){
+      const d=x.getImageData(0,0,w,h),p=d.data,hist=new Uint32Array(256);
+      for(let i=0;i<p.length;i+=4){const l=(p[i]*299+p[i+1]*587+p[i+2]*114)/1000|0;p[i]=l;hist[l]++}
+      const tot=w*h;let lo=0,hi=255,acc=0;
+      for(let v=0;v<256;v++){acc+=hist[v];if(acc>tot*.02){lo=v;break}}
+      acc=0;for(let v=255;v>=0;v--){acc+=hist[v];if(acc>tot*.10){hi=v;break}}
+      const rng=Math.max(1,hi-lo);
+      for(let i=0;i<p.length;i+=4){let v=(p[i]-lo)/rng;v=v<0?0:v>1?1:v;v=Math.pow(v,1.4)*255;p[i]=p[i+1]=p[i+2]=v}
+      x.putImageData(d,0,0);
+    }
+    const out=await new Promise(r=>c.toBlob(r,'image/jpeg',.85));
+    if(!out)throw new Error('toBlob');
+    return {blob:out,w,h};
+  }finally{URL.revokeObjectURL(u)}
+}
+let jsp=null;
+function loadPDF(){
+  if(window.jspdf)return Promise.resolve(window.jspdf.jsPDF);
+  return jsp||(jsp=new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    sc.onload=()=>window.jspdf?res(window.jspdf.jsPDF):rej();sc.onerror=()=>{jsp=null;rej()};document.head.appendChild(sc)}));
+}
+const toDataURL=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(b)});
+async function makePDF(pages){
+  const J=await loadPDF();let doc=null;
+  for(const pg of pages){
+    const o=pg.w>pg.h?'l':'p',data=await toDataURL(pg.blob);
+    if(!doc)doc=new J({orientation:o,unit:'px',format:[pg.w,pg.h],hotfixes:['px_scaling'],compress:true});else doc.addPage([pg.w,pg.h],o);
+    doc.addImage(data,'JPEG',0,0,pg.w,pg.h);
+  }
+  return doc.output('blob');
+}
+async function wzSave(){
+  const btn=$('#wznext');btn.disabled=true;btn.textContent=t('saving');
+  let outs=[],pdfErr=false;
+  try{
+    if(wz.file)outs=[{blob:wz.file,mime:wz.file.type||'',ext:(wz.file.name.match(/\.[^.]+$/)||[''])[0]}];
+    else{
+      const pr=[];for(const p of wz.pages)pr.push(await processPage(p.b,wz.enh));
+      if(pr.length===1)outs=[{blob:pr[0].blob,mime:'image/jpeg',ext:'.jpg'}];
+      else try{outs=[{blob:await makePDF(pr),mime:'application/pdf',ext:'.pdf'}]}
+        catch(e){outs=pr.map(p=>({blob:p.blob,mime:'image/jpeg',ext:'.jpg'}));pdfErr=true}
+    }
+  }catch(e){toast(t('procFail'));btn.disabled=false;btn.textContent=t('save');return}
+  const base=$('#wzname').value.trim()||wz.type||'file',note=$('#wznote').value,now=Date.now();
+  files=files.filter(f=>!f.sample);
+  for(let i=outs.length-1;i>=0;i--){const o=outs[i];
+    const f={id:uid(),name:base+(outs.length>1?' ('+(i+1)+')':'')+o.ext,type:o.mime,size:o.blob.size,added:now+i,note,noteAt:note.trim()?now:0,kind:wz.type,blob:o.blob};
+    files.unshift(f);await put(f)}
+  $('#wz').close();wzReset();filter='all';kindF='all';render();toast(pdfErr?t('pdfFail'):t('savedOk'));
+}
+$('#wztypes').addEventListener('click',e=>{const b=e.target.closest('.tile');if(!b)return;wz.type=b.dataset.k;go(2)});
+$('#wzcam').addEventListener('click',()=>$('#cam').click());
+$('#wzpick').addEventListener('click',()=>$('#pickw').click());
+$('#cam').addEventListener('change',e=>{addPicked([...e.target.files]);e.target.value=''});
+$('#pickw').addEventListener('change',e=>{addPicked([...e.target.files]);e.target.value=''});
+$('#wzpages').addEventListener('click',e=>{
+  const rm=e.target.closest('[data-rm]');
+  if(rm){const i=+rm.dataset.rm;try{URL.revokeObjectURL(wz.pages[i].u)}catch(x){}wz.pages.splice(i,1);wzPages();return}
+  const a=e.target.closest('[data-act]');if(!a)return;
+  if(a.dataset.act==='cam')$('#cam').click();
+  if(a.dataset.act==='change'){wz.file=null;wzPages()}
+});
+$('#wzpages').addEventListener('change',e=>{if(e.target.id==='wzenh')wz.enh=e.target.checked});
+$('#wznext').addEventListener('click',()=>{if(wz.step===2)go(3);else if(wz.step===3)wzSave()});
+$('#wzback').addEventListener('click',()=>go(wz.step-1));
+$('#wzbrowse').addEventListener('click',()=>{$('#wz').close();wzReset()});
+$('#wzx').addEventListener('click',()=>{$('#wz').close();wzReset()});
+$('#wznote').addEventListener('input',wzPreview);
+$('#wzquick').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const h='#'+b.dataset.t.replace(/\s+/g,'_');const n=$('#wznote');if(!n.value.includes(h))n.value=(n.value.trim()+' '+h).trim();wzPreview()});
+
 /* ——— تطبيق اللغة / Appliquer la langue ——— */
 function applyLang(){
   const h=document.documentElement;h.lang=lang;h.dir=lang==='ar'?'rtl':'ltr';
@@ -481,15 +707,8 @@ $('#langb').addEventListener('click',()=>{
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;filter=b.dataset.g;render();window.scrollTo({top:$('#tabs').offsetTop-8,behavior:'smooth'})});
 $('#list').addEventListener('click',e=>{const c=e.target.closest('.card');if(c)openEd(c.dataset.id)});
 $('#q').addEventListener('input',e=>{q=e.target.value;render()});
-$('#addb').addEventListener('click',()=>$('#pick').click());
-$('#pick').addEventListener('change',async e=>{
-  const fs=[...e.target.files];if(!fs.length)return;
-  files=files.filter(f=>!f.sample);
-  const added=[];
-  for(const file of fs){const f={id:uid(),name:file.name,type:file.type||'',size:file.size,added:Date.now(),note:'',blob:file};files.unshift(f);added.push(f);await put(f)}
-  e.target.value='';filter='all';render();
-  if(added.length===1)openEd(added[0].id);else toast(t('addedMany',added.length));
-});
+$('#addb').addEventListener('click',()=>openWz());
+$('#tf').addEventListener('change',e=>{kindF=e.target.value;render()});
 $('#note').addEventListener('input',preview);
 $('#quick').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const h='#'+b.dataset.t.replace(/\s+/g,'_');const n=$('#note');if(!n.value.includes(h))n.value=(n.value.trim()+' '+h).trim();preview()});
 $('#save').addEventListener('click',saveEd);
@@ -526,10 +745,11 @@ $('#lockb').hidden=!pinRec;
     const sp=new URLSearchParams(location.search);
     if(sp.has('shared')){const n=+sp.get('shared')||0;history.replaceState(null,'',location.pathname);
       const act=()=>{if(n){filter='all';render();if(n===1&&files[0])openEd(files[0].id);else toast(t('shared',n))}else toast(t('sharedNone'))};
-      if(lockOn())afterUnlock=act;else act()}
+      launchWz=false;if(lockOn())afterUnlock=act;else act()}
   }catch(e){}
   let skip=false;try{skip=!!localStorage.getItem(SK)}catch(e){}
   if(!pinRec&&!skip)showLock('new');
+  else if(!lockOn()&&launchWz){launchWz=false;if(wantLaunch())openWz()}
 })();
 
 let installEv=null;
