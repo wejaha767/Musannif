@@ -156,6 +156,23 @@ select{font:inherit;font-size:16px;color:inherit;min-height:48px;border:1px soli
 .callinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .callinks a{min-height:40px;font-size:14px;padding:6px 12px}
 .calsec h2{font-size:17px}
+.calbox{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 10px 12px}
+.calbox .calh{margin-top:0}
+.calbox .calh h2{font-size:18px;flex:1}
+.calbox .calh button{min-width:40px;min-height:40px;font-size:18px;background:var(--bg)}
+.calbox .calh .tod{font-size:13px;padding:0 10px;font-weight:500}
+.calbox .wd{margin-top:8px}
+.calbox .day{aspect-ratio:auto;height:44px;min-height:0;border:0;background:none;position:relative;font-size:15px}
+.calbox .day.has{background:color-mix(in srgb,var(--acc) 11%,transparent);font-weight:500}
+.calbox .day.today{border:2px solid var(--acc)}
+.calbox .day.sel{background:var(--ink);color:var(--bg)}
+.calbox .day .n{position:absolute;top:1px;inset-inline-end:2px;min-width:17px;height:17px;border-radius:9px;background:var(--acc);color:#fff;font-size:10.5px;font-weight:700;display:grid;place-items:center;padding:0 4px;line-height:1}
+.calbox .day .dd{position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;background:#b7791f}
+.calbox .legend{margin-top:8px}
+.legend .nb{display:inline-grid;place-items:center;min-width:16px;height:16px;border-radius:8px;background:var(--acc);color:#fff;font-size:10px;margin-inline-end:5px;vertical-align:-3px}
+.legend .dd{background:#b7791f}
+.daybar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;padding-block:6px;padding-inline:14px 6px;background:var(--ink);color:var(--bg);border-radius:12px;font-weight:500;font-size:15px}
+.daybar button{min-width:40px;min-height:40px;border:0;border-radius:9px;background:rgb(255 255 255/.14);color:inherit;font-size:20px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media(min-width:700px){h1{font-size:44px}}
 </style>
@@ -173,8 +190,9 @@ select{font:inherit;font-size:16px;color:inherit;min-height:48px;border:1px soli
       <input id="q" class="search" type="search" data-ph="search" data-al="searchAria">
       <select id="tf" data-al="typeL"></select>
     </div>
-    <div class="seg" id="seg"><button type="button" data-v="list" data-i="viewList"></button><button type="button" data-v="cal" data-i="viewCal"></button></div>
   </header>
+  <section id="calbox" class="calbox" data-al="viewCal"></section>
+  <div id="daybar" class="daybar" hidden></div>
   <nav id="tabs" class="tabs" data-al="cats"></nav>
   <p id="info" class="note-s"></p>
   <main id="list"></main>
@@ -329,7 +347,7 @@ ar:{title:'مصنّف الملفات',other:'Français',
  viewList:'القائمة',viewCal:'التقويم',dueL:'موعد مرتبط بالملف (اختياري)',dueHelp:'مثل تاريخ دفع فاتورة أو انتهاء صلاحية وثيقة.',
  gcal:'إضافة إلى تقويم Google',ics:'ملف تقويم (.ics)',dueBadge:d=>'موعد: '+d,late:' — فات',upcoming:'المواعيد القادمة',overdueH:'مواعيد فائتة',
  noUpcoming:'لا مواعيد قادمة. أضف موعدًا لأي ملف من نافذة تعديله.',dueDay:'مواعيد هذا اليوم',addedDay:'أُضيفت في هذا اليوم',nothingDay:'لا شيء في هذا اليوم.',
- prevM:'الشهر السابق',nextM:'الشهر التالي',wd:['إثن','ثلا','أرب','خمي','جمع','سبت','أحد'],legDue:'موعد',legAdd:'إضافة ملف',
+ prevM:'الشهر السابق',nextM:'الشهر التالي',wd:['إثن','ثلا','أرب','خمي','جمع','سبت','أحد'],legDue:'موعد',legAdd:'عدد الملفات المضافة',dayFiles:(d,n)=>'ملفات أُضيفت في '+d+' ('+n+')',showAll:'عرض كل الملفات',todayB:'اليوم',
  kb:'ك.ب',mb:'م.ب',locale:'ar-u-nu-latn'},
 fr:{title:'Classeur de fichiers',other:'العربية',
  sub:'Écrivez une note sur chaque fichier : l’application le range automatiquement, par hashtags comme <b class="ht">#factures</b> ou par mots-clés.',
@@ -366,7 +384,7 @@ fr:{title:'Classeur de fichiers',other:'العربية',
  viewList:'Liste',viewCal:'Calendrier',dueL:'Échéance liée au fichier (facultatif)',dueHelp:'Ex. : date de paiement d’une facture ou d’expiration d’un document.',
  gcal:'Ajouter à Google Agenda',ics:'Fichier agenda (.ics)',dueBadge:d=>'Échéance : '+d,late:' — dépassée',upcoming:'Échéances à venir',overdueH:'Échéances dépassées',
  noUpcoming:'Aucune échéance à venir. Ajoutez-en une depuis la fiche d’un fichier.',dueDay:'Échéances du jour',addedDay:'Ajoutés ce jour',nothingDay:'Rien ce jour-là.',
- prevM:'Mois précédent',nextM:'Mois suivant',wd:['L','M','M','J','V','S','D'],legDue:'échéance',legAdd:'fichier ajouté',
+ prevM:'Mois précédent',nextM:'Mois suivant',wd:['L','M','M','J','V','S','D'],legDue:'échéance',legAdd:'fichiers ajoutés',dayFiles:(d,n)=>'Ajoutés le '+d+' ('+n+')',showAll:'Tout afficher',todayB:'Auj.',
  kb:'Ko',mb:'Mo',locale:'fr'}
 };
 let lang='ar';
@@ -394,7 +412,6 @@ let types=null;try{types=JSON.parse(localStorage.getItem('musannif-types'))}catc
 const getTypes=()=>types&&types.length?types:DEF_TYPES[lang];
 const wantLaunch=()=>{try{return localStorage.getItem('musannif-launch')!=='0'}catch(e){return true}};
 let kindF='all',launchWz=true,selDay=null,calMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
-let view='list';try{view=localStorage.getItem('musannif-view')==='cal'?'cal':'list'}catch(e){}
 const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const pd=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
 const COLORS=['#e4572e','#2f7bbf','#c99700','#7a5ba6','#2a9d8f','#c0577a','#4f6d7a','#d17a22'];
@@ -458,7 +475,11 @@ function render(){
   const kinds=[...new Set([...getTypes(),...files.map(f=>f.kind).filter(Boolean)])];
   if(kindF!=='all'&&!kinds.includes(kindF))kindF='all';
   $('#tf').innerHTML=`<option value="all">${t('allTypes')}</option>`+kinds.map(k=>`<option value="${esc(k)}"${k===kindF?' selected':''}>${esc(k)}</option>`).join('');
-  const vis=files.filter(f=>(kindF==='all'||f.kind===kindF)&&(!nq||norm(f.name+' '+f.note+' '+(f.kind||'')).includes(nq)));
+  const base=files.filter(f=>(kindF==='all'||f.kind===kindF)&&(!nq||norm(f.name+' '+f.note+' '+(f.kind||'')).includes(nq)));
+  $('#calbox').innerHTML=calHTML(base);
+  const vis=selDay?base.filter(f=>ymd(new Date(f.added))===selDay):base;
+  const bar=$('#daybar');bar.hidden=!selDay;
+  if(selDay)bar.innerHTML=`<span>${esc(t('dayFiles',dlong(selDay),vis.length))}</span><button type="button" id="dayx" aria-label="${t('showAll')}">×</button>`;
   const G=new Map();
   for(const f of vis)for(const g of groupsOf(f.note)){if(!G.has(g))G.set(g,[]);G.get(g).push(f)}
   const order=[...G.keys()].sort((a,b)=>rank(a)-rank(b)||a.localeCompare(b,lang));
@@ -466,13 +487,12 @@ function render(){
   $('#tabs').innerHTML=`<button class="tab" type="button" data-g="all" style="--c:var(--ink)" aria-pressed="${filter==='all'}">${t('all')}<span>${vis.length}</span></button>`+
     order.map(g=>`<button class="tab" type="button" data-g="${esc(g)}" style="--c:${color(g)}" aria-pressed="${filter===g}">${esc(gl(g))}<span>${G.get(g).length}</span></button>`).join('');
   $('#info').textContent=files.some(f=>f.sample)?t('sampleInfo'):!db?t('noStore'):'';
-  document.querySelectorAll('#seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===view));
-  $('#tabs').hidden=view==='cal';
-  if(view==='cal'){$('#list').innerHTML=calHTML(vis);return}
+  const dues=selDay?base.filter(f=>f.due===selDay):[];
+  const dueSec=dues.length?`<section class="grp calsec"><h2 style="--c:#b7791f"><i></i>${t('dueDay')}<span>${dues.length}</span></h2><div class="cards">${dues.map(card).join('')}</div></section>`:'';
   if(!files.length){$('#list').innerHTML=`<div class="empty-st">${t('empty')}</div>`;return}
-  if(!vis.length){$('#list').innerHTML=`<div class="empty-st">${t('noRes')}</div>`;return}
+  if(!vis.length){$('#list').innerHTML=dueSec+`<div class="empty-st">${selDay?t('nothingDay'):t('noRes')}</div>`;return}
   const shown=filter==='all'?order:[filter];
-  $('#list').innerHTML=shown.map(g=>`<section class="grp"><h2 style="--c:${color(g)}"><i></i>${esc(gl(g))}<span>${G.get(g).length}</span></h2><div class="cards">${G.get(g).map(card).join('')}</div></section>`).join('');
+  $('#list').innerHTML=dueSec+shown.map(g=>`<section class="grp"><h2 style="--c:${color(g)}"><i></i>${esc(gl(g))}<span>${G.get(g).length}</span></h2><div class="cards">${G.get(g).map(card).join('')}</div></section>`).join('');
 }
 
 function toast(msg,btn,fn){
@@ -730,31 +750,21 @@ $('#wznote').addEventListener('input',wzPreview);
 $('#wzquick').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const h='#'+b.dataset.t.replace(/\s+/g,'_');const n=$('#wznote');if(!n.value.includes(h))n.value=(n.value.trim()+' '+h).trim();wzPreview()});
 
 /* ——— التقويم / Calendrier ——— */
-function calHTML(vis){
+const dlong=k=>{try{return pd(k).toLocaleDateString(t('locale'),{day:'numeric',month:'long'})}catch(e){return k}};
+function calHTML(list){
   const y=calMonth.getFullYear(),mo=calMonth.getMonth(),today=ymd(new Date());
   const off=(new Date(y,mo,1).getDay()+6)%7,days=new Date(y,mo+1,0).getDate();
-  const due=new Map(),add=new Map(),push=(m,k,f)=>{if(!m.has(k))m.set(k,[]);m.get(k).push(f)};
-  for(const f of vis){if(f.due)push(due,f.due,f);push(add,ymd(new Date(f.added)),f)}
+  const add=new Map(),due=new Set();
+  for(const f of list){const k=ymd(new Date(f.added));add.set(k,(add.get(k)||0)+1);if(f.due)due.add(f.due)}
   const rtl=lang==='ar';
-  let h=`<div class="calh"><button type="button" id="cprev" aria-label="${t('prevM')}">${rtl?'›':'‹'}</button><h2>${esc(calMonth.toLocaleDateString(t('locale'),{month:'long',year:'numeric'}))}</h2><button type="button" id="cnext" aria-label="${t('nextM')}">${rtl?'‹':'›'}</button></div>`;
+  let h=`<div class="calh"><button type="button" id="cprev" aria-label="${t('prevM')}">${rtl?'›':'‹'}</button><h2>${esc(calMonth.toLocaleDateString(t('locale'),{month:'long',year:'numeric'}))}</h2><button type="button" class="tod" id="ctod">${t('todayB')}</button><button type="button" id="cnext" aria-label="${t('nextM')}">${rtl?'‹':'›'}</button></div>`;
   h+=`<div class="wd">${t('wd').map(w=>`<span>${w}</span>`).join('')}</div><div class="cal">`;
   for(let i=0;i<off;i++)h+='<span></span>';
   for(let d=1;d<=days;d++){
-    const k=ymd(new Date(y,mo,d));
-    h+=`<button type="button" class="day${k===today?' today':''}${k===selDay?' sel':''}" data-d="${k}"><span>${d}</span><span class="dt">${due.has(k)?'<i class="d"></i>':''}${add.has(k)?'<i class="a"></i>':''}</span></button>`;
+    const k=ymd(new Date(y,mo,d)),n=add.get(k)||0;
+    h+=`<button type="button" class="day${n?' has':''}${k===today?' today':''}${k===selDay?' sel':''}" data-d="${k}" aria-label="${esc(dlong(k))}${n?' — '+n:''}">${d}${n?`<b class="n">${n}</b>`:''}${due.has(k)?'<i class="dd"></i>':''}</button>`;
   }
-  h+=`</div><div class="legend"><span><i class="d"></i>${t('legDue')}</span><span><i class="a"></i>${t('legAdd')}</span></div>`;
-  const sec=(title,list)=>list.length?`<section class="grp calsec"><h2 style="--c:var(--acc)"><i></i>${title}<span>${list.length}</span></h2><div class="cards">${list.map(card).join('')}</div></section>`:'';
-  if(selDay){
-    const a=due.get(selDay)||[],b=add.get(selDay)||[];
-    h+=`<h2 style="font-size:19px;margin:22px 0 0">${esc(pd(selDay).toLocaleDateString(t('locale'),{weekday:'long',day:'numeric',month:'long'}))}</h2>`;
-    h+=(a.length||b.length)?sec(t('dueDay'),a)+sec(t('addedDay'),b):`<p class="empty-st" style="padding:20px">${t('nothingDay')}</p>`;
-  }else{
-    const withDue=vis.filter(f=>f.due).sort((a,b)=>a.due<b.due?-1:1);
-    const late=withDue.filter(f=>f.due<today),next=withDue.filter(f=>f.due>=today);
-    h+=sec(t('overdueH'),late)+(next.length?sec(t('upcoming'),next):`<p class="empty-st" style="padding:20px">${t('noUpcoming')}</p>`);
-  }
-  return h;
+  return h+`</div><div class="legend"><span><b class="nb">2</b>${t('legAdd')}</span><span><i class="dd"></i>${t('legDue')}</span></div>`;
 }
 const icsEsc=s=>String(s||'').replace(/\\/g,'\\\\').replace(/([,;])/g,'\\$1').replace(/\r?\n/g,'\\n');
 function calLinks(f,dueStr){
@@ -769,12 +779,13 @@ function calLinks(f,dueStr){
   const a=$('#icsl');try{if(a.dataset.u)URL.revokeObjectURL(a.dataset.u);a.dataset.u=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));a.href=a.dataset.u}catch(e){}
   a.download=title.replace(/[\\/:*?"<>|]/g,'_')+'.ics';
 }
-$('#seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.v;try{localStorage.setItem('musannif-view',view)}catch(x){}selDay=null;render()});
-$('#list').addEventListener('click',e=>{
-  if(e.target.closest('#cprev')){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1);selDay=null;render();return}
-  if(e.target.closest('#cnext')){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);selDay=null;render();return}
-  const d=e.target.closest('.day');if(d){selDay=selDay===d.dataset.d?null:d.dataset.d;render()}
+$('#calbox').addEventListener('click',e=>{
+  if(e.target.closest('#cprev')){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1);render();return}
+  if(e.target.closest('#cnext')){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);render();return}
+  if(e.target.closest('#ctod')){const n=new Date();calMonth=new Date(n.getFullYear(),n.getMonth(),1);selDay=ymd(n);filter='all';render();return}
+  const d=e.target.closest('.day');if(d){selDay=selDay===d.dataset.d?null:d.dataset.d;filter='all';render();if(selDay)$('#daybar').scrollIntoView({behavior:'smooth',block:'start'})}
 });
+$('#daybar').addEventListener('click',e=>{if(e.target.closest('#dayx')){selDay=null;render()}});
 $('#eddue').addEventListener('input',()=>cur&&calLinks(cur,$('#eddue').value));
 
 /* ——— تطبيق اللغة / Appliquer la langue ——— */
