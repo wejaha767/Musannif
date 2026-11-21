@@ -85,6 +85,8 @@ details{margin:32px 0 8px;color:var(--mut);font-size:14px}
 summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
 header{position:relative}
 .top{display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px}
+.calb{display:inline-flex;align-items:center;gap:6px}.calb svg{width:20px;height:20px;color:var(--acc)}
+.calb[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}.calb[aria-pressed=true] svg{color:var(--bg)}
 .pillb{min-height:44px;padding:6px 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:500}
 .lock{position:fixed;inset:0;z-index:50;background:#1f2a2e;color:#f7f6f2;display:none;align-items:center;justify-content:center;padding:24px 16px calc(24px + env(safe-area-inset-bottom));overflow:auto}
 .lock.on,html.locked .lock{display:flex}
@@ -181,6 +183,7 @@ select{font:inherit;font-size:16px;color:inherit;min-height:48px;border:1px soli
 <div class="wrap">
   <header>
     <div class="top">
+      <button id="calb" class="pillb calb" type="button" aria-pressed="false" aria-controls="calbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="8.5" cy="14.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="14.5" r="1" fill="currentColor" stroke="none"/></svg><span data-i="viewCal"></span></button>
       <button id="langb" class="pillb" type="button" lang="fr">Français</button>
       <button id="lockb" class="pillb" type="button" data-i="lock" hidden>قفل</button>
     </div>
@@ -191,7 +194,7 @@ select{font:inherit;font-size:16px;color:inherit;min-height:48px;border:1px soli
       <select id="tf" data-al="typeL"></select>
     </div>
   </header>
-  <section id="calbox" class="calbox" data-al="viewCal"></section>
+  <section id="calbox" class="calbox" data-al="viewCal" hidden></section>
   <div id="daybar" class="daybar" hidden></div>
   <nav id="tabs" class="tabs" data-al="cats"></nav>
   <p id="info" class="note-s"></p>
@@ -786,6 +789,11 @@ $('#calbox').addEventListener('click',e=>{
   const d=e.target.closest('.day');if(d){selDay=selDay===d.dataset.d?null:d.dataset.d;filter='all';render();if(selDay)$('#daybar').scrollIntoView({behavior:'smooth',block:'start'})}
 });
 $('#daybar').addEventListener('click',e=>{if(e.target.closest('#dayx')){selDay=null;render()}});
+$('#calb').addEventListener('click',()=>{
+  const box=$('#calbox'),open=box.hidden;box.hidden=!open;$('#calb').setAttribute('aria-pressed',open);
+  if(!open&&selDay){selDay=null;render()}
+  if(open)box.scrollIntoView({behavior:'smooth',block:'nearest'});
+});
 $('#eddue').addEventListener('input',()=>cur&&calLinks(cur,$('#eddue').value));
 
 /* ——— تطبيق اللغة / Appliquer la langue ——— */
